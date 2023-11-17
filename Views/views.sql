@@ -67,10 +67,10 @@ USE DATABASE A4_DB;
 		SUB_CATEGORY, 
 		COUNT(Title) as Product_Count
 	FROM 
-		a4_db.product_views_and_purchases_dim_model.PRODUCT_DIMESNION
-	GROUP BY 
-		MAIN_CATEGORY, 
-		SUB_CATEGORY;
+		a4_db.product_views_and_purchases_dim_model.PRODUCT_DIMENSION
+	GROUP BY  
+		TITLE, 
+        SUB_CATEGORY;
 
 -- -- 7) Historical Trend Analysis
 

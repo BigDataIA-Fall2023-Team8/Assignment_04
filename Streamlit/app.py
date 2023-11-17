@@ -168,9 +168,8 @@ def main():
         # - SALES_ID: Number
         # """.strip()
 
-
+        #1st approach
         chain = create_sql_query_chain(ChatOpenAI(temperature=0), db)
-        
 
         # Initialize session state variable
         if 'generated_sql_query' not in st.session_state:
@@ -211,12 +210,13 @@ def main():
                 except Exception as e:
                     st.error(f'Error executing query: {e}')
         
+        #---------------------------------------------------------------------------------------------------------------
 
-        #2nd approach
-        #SQL SQLDATABASE CHAIN -SESSION STATE
-        # Import additional libraries for database connection
+        # # 2nd approach
+        # # SQL SQLDATABASE CHAIN -SESSION STATE
+        # # Import additional libraries for database connection
 
-        # Initialize the LLM and SQLDatabaseChain
+        # # Initialize the LLM and SQLDatabaseChain
         # llm = OpenAI(temperature=0, verbose=True)
         # db_chain = SQLDatabaseChain.from_llm(llm, db, verbose=True)  # Assuming 'db' is your database object
 
