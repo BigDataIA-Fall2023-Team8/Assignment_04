@@ -5,6 +5,17 @@ import configparser
 from pathlib import Path
 import toml
 
+import os
+
+# Load environment variables
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
+openai_api_key = os.getenv('OPENAI_API_KEY')
+
 
 def get_dev_config(
     environment: str = 'dev',

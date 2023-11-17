@@ -2,6 +2,18 @@ import sys
 from snowflake.snowpark.functions import udf
 from snowflake.snowpark.types import FloatType
 
+import os
+
+# Load environment variables
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
+openai_api_key = os.getenv('OPENAI_API_KEY')
+
+
 # Define the Python function to calculate conversion rate
 def calculate_conversion_rate(estimated_views: float, estimated_purchases: float) -> float:
     if estimated_views > 0:  # Prevent division by zero

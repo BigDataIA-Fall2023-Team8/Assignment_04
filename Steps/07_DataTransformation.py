@@ -1,3 +1,13 @@
+import os
+
+# Load environment variables
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
+openai_api_key = os.getenv('OPENAI_API_KEY')
 
 from snowflake.snowpark.functions import col, when, lit
  
@@ -9,7 +19,7 @@ def create_schema(session, schema_name):
 # Function to clean and transform the data
 def transform_data(session, source_table, schema_name, target_table):
     # Read data from the source table
-    df = session.table(source_table)
+    df = session.table(f"{schema_name}.{source_table}")
  
     # Replace null BRAND with 'Brand not available'
     df = df.withColumn('BRAND', when(col('BRAND').isNull(), lit('Brand not available')).otherwise(col('BRAND')))
@@ -19,10 +29,10 @@ def transform_data(session, source_table, schema_name, target_table):
     df = df.withColumn('RATINGS', when(col('RATINGS').isNull(), lit(0)).otherwise(col('RATINGS')))
  
     # Replace seller types codes with full text
-    df = df.withColumn('SELLER_TYPES', col('SELLER_TYPES').replace('[AMZ]', 'Amazon').replace('[FBA]', 'Fulfilled by Amazon').replace('[FBM]', 'Fulfilled by Merchants'))
+    #df = df.withColumn('SELLER_TYPES', col('SELLER_TYPES').replace('[AMZ]', 'Amazon').replace('[FBA]', 'Fulfilled by Amazon').replace('[FBM]', 'Fulfilled by Merchants'))
  
     # Drop rows where NAME is null
-    df = df.filter(col('NAME').isNotNull())
+    df = df.filter(col('product_NAME').isNotNull())
  
     # Write the transformed data into the target table
     df.write.saveAsTable(f"{schema_name}.{target_table}", mode='overwrite')
@@ -30,8 +40,10 @@ def transform_data(session, source_table, schema_name, target_table):
     return "Data has been transformed and loaded into the target table."
  
 # Main function to orchestrate the schema creation and data transformation
-def main(session, source_table, schema_name, target_table):
+def main(session, *args):
     schema_name = 'product_views_and_purchases_dim_model'
+    source_table = 'weekly_sales'
+    target_table = 'weekly_sales'
     print(create_schema(session, schema_name))
     print(transform_data(session, source_table, schema_name, target_table))
     return "ETL process completed successfully."

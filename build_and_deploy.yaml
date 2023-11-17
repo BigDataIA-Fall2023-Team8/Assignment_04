@@ -1,0 +1,37 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Set Environment Variables
+      run: |
+        echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
+        echo "SNOWFLAKE_PASSWORD=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
+        echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT }}" >> $GITHUB_ENV
+        echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WAREHOUSE }}" >> $GITHUB_ENV
+        echo "SNOWFLAKE_DATABASE=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
+        echo "SNOWFLAKE_SCHEMA=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+
+    # Add steps to install dependencies, run tests, deploy, etc.
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run your application
+      run: python your_script.py

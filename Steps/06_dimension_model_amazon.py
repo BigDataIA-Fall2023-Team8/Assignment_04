@@ -1,10 +1,24 @@
 # Function to create dimension tables
+import os
+
+# Load environment variables
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
+openai_api_key = os.getenv('OPENAI_API_KEY')
+
+
 def create_schema(session, schema_name):
     session.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_name}").collect()
     return f"Schema '{schema_name}' has been created."
 
 def create_and_populate_dimension_tables(session, schema_name):
-    # Create and populate the Brand dimension table
+    
+    # Create the Brand dimension table
+    session.sql(f"""DROP TABLE IF EXISTS {schema_name}.brand_dimension;""").collect()
     session.sql(f"""
         CREATE TABLE IF NOT EXISTS {schema_name}.brand_dimension (
             Brand_ID INTEGER AUTOINCREMENT PRIMARY KEY,
@@ -13,12 +27,17 @@ def create_and_populate_dimension_tables(session, schema_name):
     """).collect()
     session.sql(f"""
         INSERT INTO {schema_name}.brand_dimension (Brand_Name)
-        SELECT DISTINCT LEFT(BRAND, 16777215)
-        FROM AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES
-        WHERE BRAND IS NOT NULL
+        SELECT DISTINCT LEFT(pvp.BRAND, 16777215)
+        FROM AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES AS pvp
+        FULL OUTER JOIN 
+        AMAZON_SALES_AND_MARKET_SHARE_DEMO.SALES_ESTIMATES_SCHEMA.SALES_ESTIMATES_WEEKLY AS sew
+        ON pvp.BRAND = sew.BRAND
+        WHERE pvp.BRAND IS NOT NULL;
     """).collect()
 
+# ----------------------------------------------------------------------------------------------------------------
     # Create and populate the Country dimension table
+    session.sql(f"""DROP TABLE IF EXISTS {schema_name}.country_dimension;""").collect()
     session.sql(f"""
         CREATE TABLE IF NOT EXISTS {schema_name}.country_dimension (
             Country_ID INTEGER AUTOINCREMENT PRIMARY KEY,
@@ -32,10 +51,14 @@ def create_and_populate_dimension_tables(session, schema_name):
         WHERE COUNTRY IS NOT NULL
     """).collect()
 
+# ----------------------------------------------------------------------------------------------------------------
+
     # Create and populate the Date dimension table
+    session.sql(f"""DROP TABLE IF EXISTS {schema_name}.period_dimension;""").collect()
     session.sql(f"""
         CREATE TABLE IF NOT EXISTS {schema_name}.date_dimension (
             Date_ID INTEGER AUTOINCREMENT PRIMARY KEY,
+            Date DATE,
             Month_Number INTEGER,
             Year_Number INTEGER,
             UNIQUE(Month_Number, Year_Number)
@@ -43,12 +66,17 @@ def create_and_populate_dimension_tables(session, schema_name):
     """).collect()
     session.sql(f"""
         INSERT INTO {schema_name}.date_dimension (Month_Number, Year_Number)
-        SELECT DISTINCT MONTH, YEAR
-        FROM AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES
-        WHERE MONTH IS NOT NULL AND YEAR IS NOT NULL
+        SELECT DISTINCT cdd.MONTH, cdd.YEAR
+        FROM AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES AS pvp
+        FULL OUTER JOIN
+        CALENDAR_DATA_WITH_DATE_DIMENSIONS__FREE_READY_TO_USE.PUBLIC.CALENDAR_DATA AS cdd
+        ON pvp.YEAR = cdd.YEAR
+        WHERE cdd.MONTH IS NOT NULL AND cdd.YEAR IS NOT NULL
     """).collect()
 
+# ----------------------------------------------------------------------------------------------------------------
     # Create and populate the Product dimension table
+    session.sql(f"""DROP TABLE IF EXISTS {schema_name}.product_dimension;""").collect()
     session.sql(f"""
         CREATE TABLE IF NOT EXISTS {schema_name}.product_dimension (
             Product_ID INTEGER AUTOINCREMENT PRIMARY KEY,
@@ -70,7 +98,11 @@ def create_and_populate_dimension_tables(session, schema_name):
         WHERE PRODUCT IS NOT NULL
     """).collect()
 
+# ----------------------------------------------------------------------------------------------------------------
+
+
     # Create and populate the Site dimension table
+    session.sql(f"""DROP TABLE IF EXISTS {schema_name}.site_dimension;""").collect()
     session.sql(f"""
         CREATE TABLE IF NOT EXISTS {schema_name}.site_dimension (
             Site_ID INTEGER AUTOINCREMENT PRIMARY KEY,
@@ -84,48 +116,101 @@ def create_and_populate_dimension_tables(session, schema_name):
         WHERE SITE IS NOT NULL
     """).collect()
 
+# ----------------------------------------------------------------------------------------------------------------
+
+
     return "Dimension tables have been created and populated."
 
 
 # Function to create the fact table
 def create_fact_table(session, schema_name):
-    # Fact table
-    session.sql(f"""
-        CREATE TABLE IF NOT EXISTS {schema_name}.fact_sales (
-            Fact_ID INTEGER AUTOINCREMENT PRIMARY KEY,
-            Date_ID INTEGER,
-            Brand_ID INTEGER,
-            Country_ID INTEGER,
-            Product_ID INTEGER,
-            Site_ID INTEGER,
-            Estimated_Purchases FLOAT,
-            Estimated_Views FLOAT,
-            FOREIGN KEY (Date_ID) REFERENCES date_dimension(Date_ID),
-            FOREIGN KEY (Brand_ID) REFERENCES brand_dimension(Brand_ID),
-            FOREIGN KEY (Country_ID) REFERENCES country_dimension(Country_ID),
-            FOREIGN KEY (Product_ID) REFERENCES product_dimension(Product_ID),
-            FOREIGN KEY (Site_ID) REFERENCES site_dimension(Site_ID)
-        )
-    """).collect()
+    #Fact table
+    # session.sql(f"""DROP TABLE IF EXISTS {schema_name}.fact_sales;""").collect()
+    # session.sql(f"""
+    #     CREATE TABLE IF NOT EXISTS {schema_name}.fact_sales (
+    #     Fact_ID INTEGER AUTOINCREMENT PRIMARY KEY,
+    #     Brand_Name VARCHAR (16777215),
+    #     MONTH INTEGER,
+    #     YEAR INTEGER,
+    #     PRODUCT_NAME VARCHAR (16777215),
+    #     Estimated_Purchases FLOAT,
+    #     Estimated_Views FLOAT
+    #     );
+    # """).collect()
 
-    # Populate the Fact table with data from the original table and keys from dimension tables
+    # # Populate the Fact table with data from the original table and keys from dimension tables
+    # session.sql(f"""
+    #     INSERT INTO {schema_name}.fact_sales (
+    #     Brand_Name,MONTH,
+    #     YEAR,
+    #     PRODUCT_NAME, Estimated_Purchases, Estimated_Views)
+    #     SELECT DISTINCT
+    #     Brand,
+    #     MONTH,
+    #     YEAR,
+    #     PRODUCT,
+    #     ESTIMATED_PURCHASES,
+    #     ESTIMATED_VIEWS
+    #     FROM AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES o
+
+
+    # """).collect()
+
+
+    session.sql(f"""DROP TABLE IF EXISTS {schema_name}.weekly_sales;""").collect()
     session.sql(f"""
-        INSERT INTO {schema_name}.fact_sales (Date_ID, Brand_ID, Country_ID, Product_ID, Site_ID, Estimated_Purchases, Estimated_Views)
-        SELECT
-            dd.Date_ID,
-            bd.Brand_ID,
-            cd.Country_ID,
-            pd.Product_ID,
-            sd.Site_ID,
-            o.ESTIMATED_PURCHASES,
-            o.ESTIMATED_VIEWS
+        CREATE TABLE IF NOT EXISTS {schema_name}.weekly_sales (
+        Sales_ID INTEGER AUTOINCREMENT PRIMARY KEY,
+        IS_AVAILABLE FLOAT,
+        RATINGS FLOAT,
+        PRODUCT_NAME VARCHAR(16777215),
+        PRICE FLOAT,
+        REVIEW_COUNT INTEGER,
+        SALES FLOAT,
+        SALES_1P FLOAT,
+        SALES_3P FLOAT,
+        REVENUE FLOAT,
+        REVENUE_1P FLOAT,
+        REVENUE_3P FLOAT,
+        category_rank INTEGER,
+        subcategory_rank INTEGER
+        );
+
+    """).collect()
+    session.sql(f"""
+        INSERT INTO {schema_name}.weekly_sales (
+        IS_AVAILABLE,
+        RATINGS,
+        PRODUCT_NAME,
+        PRICE,
+        REVIEW_COUNT,
+        SALES,
+        SALES_1P,
+        SALES_3P,
+        REVENUE,
+        REVENUE_1P,
+        REVENUE_3P,
+        category_rank ,
+        subcategory_rank
+        )
+        SELECT DISTINCT
+        IS_AVAILABLE,
+        RATINGS,
+        NAME,
+        PRICE,
+        REVIEW_COUNT,
+        SALES,
+        SALES_1P,
+        SALES_3P,
+        REVENUE,
+        REVENUE_1P,
+        REVENUE_3P,
+        category_rank ,
+        subcategory_rank
         FROM
-            AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES o
-        JOIN date_dimension dd ON o.MONTH = dd.Month_Number AND o.YEAR = dd.Year_Number
-        JOIN brand_dimension bd ON o.BRAND = bd.Brand_Name
-        JOIN country_dimension cd ON o.COUNTRY = cd.Country_Number
-        JOIN product_dimension pd ON o.PRODUCT = pd.Product_Name
-        JOIN site_dimension sd ON o.SITE = sd.Site_Name
+            AMAZON_SALES_AND_MARKET_SHARE_DEMO.SALES_ESTIMATES_SCHEMA.SALES_ESTIMATES_WEEKLY
+        LIMIT 1000000;
+
     """).collect()
 
 
@@ -133,8 +218,10 @@ def create_fact_table(session, schema_name):
 def main(session, *args):
     schema_name = "PRODUCT_VIEWS_AND_PURCHASES_DIM_MODEL"
     print(create_schema(session, schema_name))   
+
+    session.sql(f"USE SCHEMA {schema_name}").collect()
     
-    create_and_populate_dimension_tables(session, schema_name)
+    #create_and_populate_dimension_tables(session, schema_name)
     create_fact_table(session, schema_name)
 
     return "Dimension and Fact tables have been created and populated."

@@ -2,6 +2,18 @@ from snowflake.snowpark import Session
 import snowflake.snowpark.functions as F
 from snowflake.snowpark.types import StructField, StructType, StringType, FloatType, DateType
 
+import os
+
+# Load environment variables
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
+openai_api_key = os.getenv('OPENAI_API_KEY')
+
+
 def get_product_sales(session: Session):
     product_sales = session.table("AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES")
     calendar_data = session.table("CALENDAR_DATA_WITH_DATE_DIMENSIONS__FREE_READY_TO_USE.PUBLIC.CALENDAR_DATA")
