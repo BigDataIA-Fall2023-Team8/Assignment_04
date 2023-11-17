@@ -29,8 +29,8 @@ Tanmay Zope [GitHub repository link]()
    3. Calendar Data with Date Dimensions [link](https://app.snowflake.com/marketplace/listing/GZSUZCCDD/infocepts-calendar-data-with-date-dimensions-free-ready-to-use)
 
 ### Project Resources
-Google codelab link [link]()
-Project Demo - [link]()
+* Google codelab link [link]()
+* Project Demo - [link]()
 ### Steps to Replicate
 steps
 ### Tech Stack
@@ -38,9 +38,9 @@ Python | Snowflake | Streamlit | GCP | LangChain
 ### Contributions
 | Name | Cotribution |
 |----------|----------|
-| Row 1, Col 1 | Row 1, Col 2 |
-| Row 2, Col 1 | Row 2, Col 2 |
-| Row 3, Col 1 | Row 3, Col 2 |
+| Soham | Row 1, Col 2 |
+| Tanmay | Row 2, Col 2 |
+| Anvi | Row 3, Col 2 |
 
 
 ### Additional Notes
