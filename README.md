@@ -6,17 +6,19 @@ Welcome to the E-commerce Insights Platform! In this project, we're leveraging S
 
 ## Project Overview
 
-### Part A: Data Engineering Pipelines with Snowpark Python
+### Part A
 
-1. **Reproduction of Steps:**
+#### **Reproduction of Steps: Data Engineering Pipelines with Snowpark Python**
 
 Anvi Jain [GitHub repository link](https://github.com/jainanv/sfguide-data-engineering-with-snowpark-python-anvi)
 Soham Deshpande [GitHub repository link]()
 Tanmay Zope [GitHub repository link]()
 
-2. **Thematic Story Development**
+### Part B
 
-   #### Part 1: Data Selection - Snowflake Marketplace
+#### **Thematic Story Development**
+
+   ##### Part 1: Data Selection - Snowflake Marketplace
 
    **Objective:**
    Harnessing data to reveal consumer behavior patterns and product performance on major e-commerce platforms, with a focus on Amazon's expansive retail ecosystem.
