@@ -18,7 +18,7 @@ Tanmay Zope [GitHub repository link]()
 
 #### **Thematic Story Development**
 
-   ##### Part 1: Data Selection - Snowflake Marketplace
+   #### Part 1: Data Selection - Snowflake Marketplace
 
    **Objective:**
    Harnessing data to reveal consumer behavior patterns and product performance on major e-commerce platforms, with a focus on Amazon's expansive retail ecosystem.
@@ -27,3 +27,22 @@ Tanmay Zope [GitHub repository link]()
    1. Amazon and E-commerce Websites: Product Views and Purchases
    2. Amazon Sales and Market Share
    3. Calendar Data with Date Dimensions
+
+### Project Resources
+Google codelab link - 
+Project Demo - 
+### Steps to Replicate
+steps
+### Tech Stack
+Python | Snowflake | Streamlit | GCP | LangChain
+### Contributions
+| Name | Cotribution |
+|----------|----------|
+| Row 1, Col 1 | Row 1, Col 2 |
+| Row 2, Col 1 | Row 2, Col 2 |
+| Row 3, Col 1 | Row 3, Col 2 |
+
+
+### Additional Notes
+WE ATTEST THAT WE HAVEN’T USED ANY OTHER STUDENTS’ WORK IN OUR ASSIGNMENT AND ABIDE BY THE
+POLICIES LISTED IN THE STUDENT HANDBOOK
