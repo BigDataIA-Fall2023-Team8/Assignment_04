@@ -1,9 +1,10 @@
+from dotenv import load_dotenv
 from snowflake.snowpark import Session
 import os
 from typing import Optional
 
-import os
 
+load_dotenv()
 # Load environment variables
 snowflake_user = os.getenv('SNOWFLAKE_USER')
 snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
@@ -36,7 +37,7 @@ def get_snowpark_session() -> Session:
     # TODO: Look for a creds.json style file. This should be the way all snowpark
     # related tools work IMO
     # if using snowsql config, like snowcli does
-    elif os.path.exists(os.path.expanduser('/workspaces/Assignment_04/config')):
+    elif os.path.exists(os.path.expanduser('/home/tanmayz/Assignment04_Updated/.snowsql')):
         snowpark_config = get_snowsql_config()
         SnowflakeConnection().connection = Session.builder.configs(snowpark_config).create()
     # otherwise configure from environment variables
@@ -51,8 +52,10 @@ def get_snowpark_session() -> Session:
             "schema": os.getenv["SNOWSQL_SCHEMA"]
         }
         SnowflakeConnection().connection = Session.builder.configs(snowpark_config).create()
+        print('Connection built')
 
     if SnowflakeConnection().connection:
+        print("Established")
         return SnowflakeConnection().connection  # type: ignore
     else:
         raise Exception("Unable to create a Snowpark session")
@@ -64,7 +67,7 @@ def get_snowpark_session() -> Session:
 # need to update snowcli to make that happen
 def get_snowsql_config(
     connection_name: str = 'dev',
-    config_file_path: str = os.path.expanduser('/workspaces/Assignment_04/config'),
+    config_file_path: str = os.path.expanduser('/home/tanmayz/Assignment04_Updated/.snowsql'),
 ) -> dict:
     import configparser
 

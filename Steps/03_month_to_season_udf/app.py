@@ -22,10 +22,9 @@ def main(month_number: int) -> str:
         return 'Summer'
     elif month_number in (9, 10, 11):
         return 'Fall'
-    elif month_number in (12, 1, 2):
-        return 'Winter'
     else:
-        return 'Please enter a valid month number'
+        return 'Winter'
+    
 
 # Register the function as a UDF in Snowflake
 # get_season_udf = udf(get_season, return_type=StringType(), input_types=[IntegerType()])

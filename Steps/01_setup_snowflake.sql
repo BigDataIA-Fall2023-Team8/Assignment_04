@@ -53,13 +53,13 @@ CREATE OR REPLACE SCHEMA ANALYTICS;
 
 -- External Frostbyte objects
 USE SCHEMA EXTERNAL;
-CREATE OR REPLACE FILE FORMAT PARQUET_FORMAT
-    TYPE = PARQUET
-    COMPRESSION = SNAPPY
+-- CREATE OR REPLACE FILE FORMAT PARQUET_FORMAT
+--     TYPE = PARQUET
+--     COMPRESSION = SNAPPY
 ;
-CREATE OR REPLACE STAGE FROSTBYTE_RAW_STAGE
-    URL = 's3://sfquickstarts/data-engineering-with-snowpark-python/'
-;
+-- CREATE OR REPLACE STAGE FROSTBYTE_RAW_STAGE
+--     URL = 's3://sfquickstarts/data-engineering-with-snowpark-python/'
+-- ;
 
 -- ANALYTICS objects
 USE SCHEMA ANALYTICS;

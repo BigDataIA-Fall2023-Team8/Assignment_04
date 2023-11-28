@@ -168,16 +168,15 @@ def main():
         # - SALES_ID: Number
         # """.strip()
 
-
+        #1st approach
         chain = create_sql_query_chain(ChatOpenAI(temperature=0), db)
-        
 
         # Initialize session state variable
         if 'generated_sql_query' not in st.session_state:
             st.session_state['generated_sql_query'] = ''
 
         # Text input for LangChain query
-        lc_query = st.text_input('Enter your LangChain question here:')
+        lc_query = st.text_input('Enter your question here:')
 
         if st.button('Generate SQL Query'):
             # Generate the SQL query using LangChain
@@ -207,18 +206,19 @@ def main():
                     with engine.connect() as conn:
                         result = conn.execute(query).fetchall()
                         st.write("Query Results:")
-                        st.write(result)
+                        st.dataframe(result)
                 except Exception as e:
-                    st.error(f'Error executing query: {e}')
+                    st.write('Entered query cannot be executed')
         
+        #---------------------------------------------------------------------------------------------------------------
 
-        #2nd approach
-        #SQL SQLDATABASE CHAIN -SESSION STATE
-        # Import additional libraries for database connection
+        # # 2nd approach
+        # # SQL SQLDATABASE CHAIN -SESSION STATE
+        # # Import additional libraries for database connection
 
-        # Initialize the LLM and SQLDatabaseChain
+        # # Initialize the LLM and SQLDatabaseChain
         # llm = OpenAI(temperature=0, verbose=True)
-        # db_chain = SQLDatabaseChain.from_llm(llm, db, verbose=True)  # Assuming 'db' is your database object
+        # db_chain = SQLDatabaseChain.from_llm(llm, db, verbose=True)  # Assuming 'db' is database object
 
         # # Initialize session state for the generated SQL query
         # if 'generated_sql_query' not in st.session_state:

@@ -1,0 +1,10 @@
+# SnowSQL config
+
+[connections.dev]
+accountname = lab93413.us-east-1
+username = sohamd148
+password = Mahos@14899
+rolename = A4_ROLE
+warehousename = A4_WH
+dbname = A4_DB
+schema = Public

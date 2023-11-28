@@ -1,5 +1,6 @@
-# Function to create dimension tables
 import os
+from snowflake.snowpark import Session
+
 
 # Load environment variables
 snowflake_user = os.getenv('SNOWFLAKE_USER')
@@ -9,7 +10,6 @@ snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
 snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
 snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
 openai_api_key = os.getenv('OPENAI_API_KEY')
-
 
 def create_schema(session, schema_name):
     session.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_name}").collect()
@@ -125,36 +125,36 @@ def create_and_populate_dimension_tables(session, schema_name):
 # Function to create the fact table
 def create_fact_table(session, schema_name):
     #Fact table
-    # session.sql(f"""DROP TABLE IF EXISTS {schema_name}.fact_sales;""").collect()
-    # session.sql(f"""
-    #     CREATE TABLE IF NOT EXISTS {schema_name}.fact_sales (
-    #     Fact_ID INTEGER AUTOINCREMENT PRIMARY KEY,
-    #     Brand_Name VARCHAR (16777215),
-    #     MONTH INTEGER,
-    #     YEAR INTEGER,
-    #     PRODUCT_NAME VARCHAR (16777215),
-    #     Estimated_Purchases FLOAT,
-    #     Estimated_Views FLOAT
-    #     );
-    # """).collect()
+    session.sql(f"""DROP TABLE IF EXISTS {schema_name}.fact_sales;""").collect()
+    session.sql(f"""
+        CREATE TABLE IF NOT EXISTS {schema_name}.fact_sales (
+        Fact_ID INTEGER AUTOINCREMENT PRIMARY KEY,
+        Brand_Name VARCHAR (16777215),
+        MONTH INTEGER,
+        YEAR INTEGER,
+        PRODUCT_NAME VARCHAR (16777215),
+        Estimated_Purchases FLOAT,
+        Estimated_Views FLOAT
+        );
+    """).collect()
 
-    # # Populate the Fact table with data from the original table and keys from dimension tables
-    # session.sql(f"""
-    #     INSERT INTO {schema_name}.fact_sales (
-    #     Brand_Name,MONTH,
-    #     YEAR,
-    #     PRODUCT_NAME, Estimated_Purchases, Estimated_Views)
-    #     SELECT DISTINCT
-    #     Brand,
-    #     MONTH,
-    #     YEAR,
-    #     PRODUCT,
-    #     ESTIMATED_PURCHASES,
-    #     ESTIMATED_VIEWS
-    #     FROM AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES o
+    # Populate the Fact table with data from the original table and keys from dimension tables
+    session.sql(f"""
+        INSERT INTO {schema_name}.fact_sales (
+        Brand_Name,MONTH,
+        YEAR,
+        PRODUCT_NAME, Estimated_Purchases, Estimated_Views)
+        SELECT DISTINCT
+        Brand,
+        MONTH,
+        YEAR,
+        PRODUCT,
+        ESTIMATED_PURCHASES,
+        ESTIMATED_VIEWS
+        FROM AMAZON_AND_ECOMMERCE_WEBSITES_PRODUCT_VIEWS_AND_PURCHASES.DATAFEEDS.PRODUCT_VIEWS_AND_PURCHASES o
 
 
-    # """).collect()
+    """).collect()
 
 
     session.sql(f"""DROP TABLE IF EXISTS {schema_name}.weekly_sales;""").collect()
@@ -216,13 +216,13 @@ def create_fact_table(session, schema_name):
 
 # Main function to orchestrate table creation and data insertion
 def main(session, *args):
-    schema_name = "PRODUCT_VIEWS_AND_PURCHASES_DIM_MODEL"
-    print(create_schema(session, schema_name))   
+    schema_name = "Data"
+    # print(create_schema(session, schema_name))   
 
     session.sql(f"USE SCHEMA {schema_name}").collect()
     
-    #create_and_populate_dimension_tables(session, schema_name)
-    create_fact_table(session, schema_name)
+    create_and_populate_dimension_tables(session, schema_name)
+    # create_fact_table(session, schema_name)
 
     return "Dimension and Fact tables have been created and populated."
 
@@ -240,10 +240,21 @@ if __name__ == '__main__':
     # Adds the root directory to the sys.path to find myproject_utils
     sys.path.append(root_dir)
 
-    # Imports snowpark_utils from your project utilities
-    from myproject_utils import snowpark_utils
-    # Gets the Snowpark session
-    session = snowpark_utils.get_snowpark_session()
+
+    # snowpark_utils
+    # # Imports snowpark_utils from your project utilities
+    # from myproject_utils import snowpark_utils
+    # # Gets the Snowpark session
+    # session = snowpark_utils.get_snowpark_session()
+    connection_parameters = {
+        "user": "sohamd148",
+        "password": "Mahos@14899",
+        "account": "lab93413.us-east-1",
+        "warehouse": "A4_WH",
+        "database": "A4_DB",
+        "schema": "Public"
+    }
+    session = Session.builder.configs(connection_parameters).create()
 
     # Try block to ensure that the session is closed properly
     try:
